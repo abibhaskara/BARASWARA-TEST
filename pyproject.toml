@@ -1,0 +1,20 @@
+[project]
+name = "baraswara"
+version = "0.3.0"
+description = "Privacy-as-a-Service Framework — Differential Privacy Engine"
+requires-python = ">=3.12"
+
+[tool.pyrefly]
+# Arahkan pyrefly ke venv agar semua packages terdeteksi
+python_interpreter = "venv/bin/python"
+site_package_path = [
+    "venv/lib/python3.14/site-packages"
+]
+search_path = ["."]
+
+[tool.pyright]
+venvPath = "."
+venv = "venv"
+pythonVersion = "3.14"
+include = ["src"]
+exclude = ["venv"]
