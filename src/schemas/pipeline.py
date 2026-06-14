@@ -45,7 +45,11 @@ class ExecuteResponse(BaseModel):
     """Response setelah pipeline privasi berhasil dieksekusi."""
     status: Literal["success"] = "success"
     result_id: str = Field(..., description="UUID unik hasil ini, dipakai sebagai hash URL")
-    result_url: str = Field(..., description="URL untuk mengakses hasil via hash")
+    result_url: str = Field(..., description="URL backend untuk mengakses hasil via hash")
+    # ── Fields yang dibutuhkan frontend ────────────────────────────────
+    secure_hash: str = Field(default="", description="HMAC-SHA256 hash pendek untuk URL publik")
+    viewer_url: str = Field(default="", description="URL frontend (port 3000) untuk hasil viewer")
+    download_url: str = Field(default="", description="URL download CSV terproteksi")
     filename: str
     summary: PipelineSummary
     numeric_stats: list[NumericStats] = Field(default_factory=list)

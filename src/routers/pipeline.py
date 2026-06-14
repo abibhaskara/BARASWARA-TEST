@@ -149,6 +149,11 @@ async def execute_pipeline(
             },
         ) from exc
 
+    # ── Set fields yang dibutuhkan frontend ───────────────────────────────────
+    response.secure_hash = secure_hash
+    response.viewer_url = f"http://localhost:3000/results/{secure_hash}"
+    response.download_url = f"{BASE_URL}/v1/results/{secure_hash}/download"
+
     # ── Simpan hasil final ke disk ────────────────────────────────────────────
     update_result(result_id, response.model_dump())
 
