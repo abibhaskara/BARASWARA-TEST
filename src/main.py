@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.privacy import inject_laplace_noise
 from src.routers import privacy_engine as privacy_engine_router
+from src.routers import pipeline as pipeline_router
 
 # ── Atur konfigurasi log biar gampang mantau server ──────────────────────────
 logging.basicConfig(
@@ -36,8 +37,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ── Pasang Router Privacy Engine (Fitur inti pre-check CSV) ──────────────────
+# ── Pasang Router Privacy Engine (Fitur inti pre-check & confirm CSV) ──────────
 app.include_router(privacy_engine_router.router)
+
+# ── Pasang Router Pipeline (Eksekusi DP + Results viewer) ───────────────────
+app.include_router(pipeline_router.router)
 
 
 # ── Endpoint Jadul (Legacy) — ntar kita rapiin ke router terpisah ────────────

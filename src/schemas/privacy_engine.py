@@ -46,3 +46,26 @@ class PreCheckResponse(BaseModel):
     status: Literal["success"] = "success"
     file_metadata: FileMetadata
     schema_recommendation: list[ColumnRecommendation]
+
+
+# ── Schema untuk Fase 2: Konfirmasi Konfigurasi ──────────────────────────────
+
+class ColumnConfig(BaseModel):
+    column_name: str
+    semantic_type: str
+    action: RecommendedAction
+    epsilon: float = Field(default=1.0, ge=0.01, le=10.0)
+
+
+class ConfirmRequest(BaseModel):
+    filename: str
+    total_rows: int
+    columns: list[ColumnConfig]
+
+
+class ConfirmResponse(BaseModel):
+    status: Literal["confirmed"] = "confirmed"
+    config_id: str
+    filename: str
+    total_columns: int
+    message: str

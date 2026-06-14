@@ -9,8 +9,9 @@ import logging
 
 from fastapi import APIRouter, File, HTTPException, UploadFile, status
 
-from src.schemas.privacy_engine import PreCheckResponse
+from src.schemas.privacy_engine import ConfirmRequest, ConfirmResponse, PreCheckResponse
 from src.services.heuristics_engine import analyze_csv
+from src.services.storage_engine import save_config
 
 logger = logging.getLogger(__name__)
 
@@ -148,3 +149,47 @@ async def pre_check(
         len(result.schema_recommendation),
     )
     return result
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# POST /v1/privacy-engine/confirm
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+@router.post(
+    "/confirm",
+    response_model=ConfirmResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Simpan Konfigurasi Privasi HITL",
+    description=(
+        "Menerima keputusan konfigurasi privasi per kolom dari user (HITL), "
+        "menyimpannya ke disk, dan mengembalikan `config_id` untuk digunakan "
+        "pada endpoint /pipeline/execute."
+    ),
+)
+async def confirm_config(payload: ConfirmRequest) -> ConfirmResponse:
+    """
+    **POST /v1/privacy-engine/confirm**
+
+    Simpan konfigurasi HITL (pilihan aksi & epsilon per kolom) ke disk.
+    Kembalikan `config_id` sebagai tiket untuk eksekusi pipeline.
+    """
+    config_data = {
+        "filename": payload.filename,
+        "total_rows": payload.total_rows,
+        "columns": [col.model_dump() for col in payload.columns],
+    }
+
+    config_id = save_config(config_data)
+
+    logger.info(
+        "Konfigurasi dikonfirmasi: config_id=%s, file='%s', %d kolom.",
+        config_id[:8], payload.filename, len(payload.columns),
+    )
+
+    return ConfirmResponse(
+        status="confirmed",
+        config_id=config_id,
+        filename=payload.filename,
+        total_columns=len(payload.columns),
+        message="Konfigurasi berhasil disimpan. Siap untuk eksekusi pipeline.",
+    )
