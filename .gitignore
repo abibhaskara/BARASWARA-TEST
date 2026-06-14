@@ -1,6 +1,14 @@
 venv/
 __pycache__/
 .DS_Store
+*.pyc
+*.pyo
+
+# IDE
+.vscode/
+
+# Runtime data (pipeline results & configs generated at runtime)
+data/
 
 # Front-end Ignore
 frontend/node_modules/
